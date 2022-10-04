@@ -1,5 +1,5 @@
 # timed-infoboxes
-Timed infoboxes plugin for Wordpress
+Plugin für Funktionen zur zeitlichen Anzeige von Infoboxen in Wordpress
 
 [infobox anfang="YYYY-MM-DD" ende="YYYY-MM-DD" farbe="farbe"]
 
