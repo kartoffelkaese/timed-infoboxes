@@ -41,12 +41,13 @@ Version: 1.0
  */
 
 /* Verbiete den direkten Zugriff auf die Plugin-Datei */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 /**
  *  Infobild auf der Startseite, feste Breite 709px, 
  * 
  * [infobild link="link-zu-einer-seite" bild="volle url zum bild" ende"YYYY-MM-DD"]
+ * Das Enddatum ist der Tag des Events, am Tag darauf verschwindet der Beitrag
  *  
  */ 
 
@@ -76,6 +77,8 @@ function infobild_handler($atts = array()) {
  * 
  *  [infobox anfang="YYYY-MM-DD" ende="YYYY-MM-DD" farbe="farbe"]
  *  
+ * Das Enddatum ist der Tag des Events, am Tag darauf verschwindet der Beitrag
+ *
  *  Farben sind definiert in den :root-variables 
  *  => menü -> design -> customizer -> zusätzliches css
  * 
