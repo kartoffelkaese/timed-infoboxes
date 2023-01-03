@@ -87,7 +87,6 @@ function infobox_handler($atts = array(), $content = null, $tag) {
 		}
 	}
 }
-?>
 
 /* DAS GLEICHE MIT EINEM BILD */
 
@@ -118,3 +117,4 @@ function infobox_handler($atts = array(), $content = null, $tag) {
 // 		return $blocks;
 // 	}
 // }
+?>
