@@ -10,6 +10,8 @@ Version: 1.0
 /**
  * Notwendiges CSS für die Boxen:
     :root {
+    	--black: #000000;
+	--white: #ffffff;
         --purple: #a50775;
         --green: #3ead48;
         --grey: #8c8c8c;
@@ -44,41 +46,10 @@ Version: 1.0
 if (!defined('ABSPATH')) exit;
 
 /**
- *  Infobild auf der Startseite, feste Breite 709px, 
- * 
- * [infobild link="link-zu-einer-seite" bild="volle url zum bild" ende"YYYY-MM-DD"]
- * Das Enddatum ist der Tag des Events, am Tag darauf verschwindet der Beitrag
- *  
- */ 
-
-add_shortcode('infobild','infobild_handler');
-function infobild_handler($atts = array()) {
-	shortcode_atts(array(
-        'link' => '',
-		'bild' => '',
-		'ende' => ''
-	), $atts);
-    $link = $atts['link'];
-    $bild = $atts['bild'];
-	$ende = $atts['ende'];
-	$enddatum = new DateTime($ende);
- 	$heute = new DateTime(date('Y-m-d'));
-
-	if ($enddatum >= $heute) {
-		$blocks = '<div class="blockdiv">
-        <a href="'.$link.'"><img src="'.$bild.'" width="709px"></a>
-        </div>';
-		return $blocks;
-	}
-}
-
-/**
  *  Infobox auf der Startseite.
  * 
- *  [infobox anfang="YYYY-MM-DD" ende="YYYY-MM-DD" farbe="farbe"]
+ *  [infobox anfang="YYYY-MM-DD" ende="YYYY-MM-DD" farbe="farbe" sfarbe="farbe"]
  *  
- * Das Enddatum ist der Tag des Events, am Tag darauf verschwindet der Beitrag
- *
  *  Farben sind definiert in den :root-variables 
  *  => menü -> design -> customizer -> zusätzliches css
  * 
@@ -89,7 +60,8 @@ function infobox_handler($atts = array(), $content = null, $tag) {
 	shortcode_atts(array(
 		'anfang' => '',
 		'ende' => '',
-		'farbe' => false
+		'farbe' => false,
+		'sfarbe' => false
 	), $atts);
 	$anfang = $atts['anfang'];
 	$ende = $atts['ende'];
@@ -100,7 +72,7 @@ function infobox_handler($atts = array(), $content = null, $tag) {
 	if (empty($anfang)) {
     	if ($enddatum >= $heute) {
  		$blocks = '<div class="blockdiv">
-        <div class="block" style="background-color:var(--' . $atts['farbe'] . ');">'
+        <div class="block" style="background-color:var(--' . $atts['farbe'] . ');color:var(--' . $atts['sfarbe'] . ');">'
  		. $content . '
         </div></div>';	
 		return $blocks;
@@ -108,7 +80,7 @@ function infobox_handler($atts = array(), $content = null, $tag) {
     } else {
         if($anfangsdatum <= $heute && $enddatum >= $heute)  {
 			$blocks = '<div class="blockdiv">
-        	<div class="block" style="background-color:var(--' . $atts['farbe'] . ');">'
+        	<div class="block" style="background-color:var(--' . $atts['farbe'] . ');color:var(--' . $atts['sfarbe'] . ');">'
  			. $content . '
         	</div></div>';
 			return $blocks;
@@ -116,3 +88,33 @@ function infobox_handler($atts = array(), $content = null, $tag) {
 	}
 }
 ?>
+
+/* DAS GLEICHE MIT EINEM BILD */
+
+/**
+ *  Infobild auf der Startseite, feste Breite 709px, 
+ * 
+ * [infobild link="link-zu-einer-seite" bild="volle url zum bild" ende"YYYY-MM-DD"]
+ *  
+ */ 
+
+// add_shortcode('infobild','infobild_handler');
+// function infobild_handler($atts = array()) {
+// 	shortcode_atts(array(
+//         'link' => '',
+// 		'bild' => '',
+// 		'ende' => ''
+// 	), $atts);
+//     $link = $atts['link'];
+//     $bild = $atts['bild'];
+// 	$ende = $atts['ende'];
+// 	$enddatum = new DateTime($ende);
+//  	$heute = new DateTime(date('Y-m-d'));
+
+//      if ($enddatum >= $heute) {
+// 		$blocks = '<div class="blockdiv">
+//         <a href="'.$link.'"><img src="'.$bild.'" width="709px"></a>
+//         </div>';
+// 		return $blocks;
+// 	}
+// }
