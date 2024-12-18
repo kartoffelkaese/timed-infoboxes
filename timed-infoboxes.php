@@ -1,120 +1,65 @@
 <?php
+declare(strict_types=1);
+
 /*
 Plugin Name: Timed Infoboxes
 Plugin URI: https://github.com/kartoffelkaese/timed-infoboxes
 Description: Plugin für Funktionen zur zeitlichen Anzeige von Infoboxen in Wordpress
 Author: Martin Urban
 Author URI: https://github.com/kartoffelkaese/timed-infoboxes
-Version: 1.0
-
-/**
- * Notwendiges CSS für die Boxen:
-    :root {
-    	--black: #000000;
-	--white: #ffffff;
-        --purple: #a50775;
-        --green: #3ead48;
-        --grey: #8c8c8c;
-        --red: #f00;
-        --mtgreen: #3ead48;
-        --bradius:3px;
-    }
-    .blockdiv {
-        text-align:center;
-        margin: 20px 0;
-        font-weight: lighter;
-    }
-    .blockdiv > a, a:visited, a:hover {
-        color: #f5f6f9;
-    }
-    .block {
-        border-radius: var(--bradius);
-        margin: 20px 20%;
-        padding: 15px;
-        text-align: center;
-    }
-    @media screen and (max-width: 767px) {
-        .block {
-        margin: 0px 0px 5px 0px;
-        padding: 5px;
-        }
-    }
-    
- */
+Version: 2.0
+Requires PHP: 8.3
+*/
 
 /* Verbiete den direkten Zugriff auf die Plugin-Datei */
 if (!defined('ABSPATH')) exit;
 
 /**
- *  Infobox auf der Startseite.
- * 
- *  [infobox anfang="YYYY-MM-DD" ende="YYYY-MM-DD" farbe="farbe" sfarbe="farbe"]
- *  
- *  Farben sind definiert in den :root-variables 
- *  => menü -> design -> customizer -> zusätzliches css
- * 
+ * Infobox Shortcode Handler
  */
-
-add_shortcode('infobox','infobox_handler');
-function infobox_handler($atts = array(), $content = null, $tag) {
-	shortcode_atts(array(
-		'anfang' => '',
-		'ende' => '',
-		'farbe' => false,
-		'sfarbe' => false
-	), $atts);
-	$anfang = $atts['anfang'];
-	$ende = $atts['ende'];
-	$anfangsdatum = new DateTime($anfang);
-	$enddatum = new DateTime($ende);
- 	$heute = new DateTime(date('Y-m-d'));
-
-	if (empty($anfang)) {
-    	if ($enddatum >= $heute) {
- 		$blocks = '<div class="blockdiv">
-        <div class="block" style="background-color:var(--' . $atts['farbe'] . ');color:var(--' . $atts['sfarbe'] . ');">'
- 		. $content . '
-        </div></div>';	
-		return $blocks;
-		}
-    } else {
-        if($anfangsdatum <= $heute && $enddatum >= $heute)  {
-			$blocks = '<div class="blockdiv">
-        	<div class="block" style="background-color:var(--' . $atts['farbe'] . ');color:var(--' . $atts['sfarbe'] . ');">'
- 			. $content . '
-        	</div></div>';
-			return $blocks;
-		}
-	}
+function infobox_handler(array $atts = [], ?string $content = null, string $tag = ''): ?string 
+{
+    $atts = [
+        'anfang' => $atts['anfang'] ?? '',
+        'ende' => $atts['ende'] ?? '',
+        'farbe' => $atts['farbe'] ?? '',
+        'sfarbe' => $atts['sfarbe'] ?? ''
+    ];
+    
+    if (empty($atts['ende']) || empty($atts['farbe']) || empty($atts['sfarbe'])) {
+        error_log("Timed Infoboxes: Erforderliche Parameter fehlen (ende, farbe oder sfarbe)");
+        return null;
+    }
+    
+    try {
+        $heute = new DateTime('today');
+        $enddatum = new DateTime($atts['ende']);
+        
+        $shouldDisplay = match(true) {
+            empty($atts['anfang']) => $enddatum > $heute,
+            default => (new DateTime($atts['anfang'])) <= $heute && $enddatum > $heute
+        };
+        
+        return $shouldDisplay ? generate_infobox($atts['farbe'], $atts['sfarbe'], $content) : null;
+        
+    } catch (Exception $e) {
+        error_log("Timed Infoboxes Error: " . $e->getMessage());
+        return null;
+    }
 }
 
-/* DAS GLEICHE MIT EINEM BILD */
-
 /**
- *  Infobild auf der Startseite, feste Breite 709px, 
- * 
- * [infobild link="link-zu-einer-seite" bild="volle url zum bild" ende"YYYY-MM-DD"]
- *  
- */ 
+ * Generiert das HTML für die Infobox
+ */
+function generate_infobox(string $farbe, string $sfarbe, ?string $content): string 
+{
+    return sprintf(
+        '<div class="blockdiv"><div class="block" style="background-color:var(--%s);color:var(--%s);">%s</div></div>',
+        esc_attr($farbe),
+        esc_attr($sfarbe),
+        wp_kses_post($content)
+    );
+}
 
-// add_shortcode('infobild','infobild_handler');
-// function infobild_handler($atts = array()) {
-// 	shortcode_atts(array(
-//         'link' => '',
-// 		'bild' => '',
-// 		'ende' => ''
-// 	), $atts);
-//     $link = $atts['link'];
-//     $bild = $atts['bild'];
-// 	$ende = $atts['ende'];
-// 	$enddatum = new DateTime($ende);
-//  	$heute = new DateTime(date('Y-m-d'));
-
-//      if ($enddatum >= $heute) {
-// 		$blocks = '<div class="blockdiv">
-//         <a href="'.$link.'"><img src="'.$bild.'" width="709px"></a>
-//         </div>';
-// 		return $blocks;
-// 	}
-// }
+add_shortcode('infobox', 'infobox_handler');
 ?>
