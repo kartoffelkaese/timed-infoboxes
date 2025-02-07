@@ -7,7 +7,7 @@ Plugin URI: https://github.com/kartoffelkaese/timed-infoboxes
 Description: Plugin für Funktionen zur zeitlichen Anzeige von Infoboxen in Wordpress
 Author: Martin Urban
 Author URI: https://github.com/kartoffelkaese/timed-infoboxes
-Version: 2.0
+Version: 2.1
 Requires PHP: 8.3
 */
 
@@ -21,13 +21,13 @@ function infobox_handler(array $atts = [], ?string $content = null, string $tag 
 {
     $atts = [
         'anfang' => $atts['anfang'] ?? '',
-        'ende' => $atts['ende'] ?? '',
+        'ende' => $atts['ende'] ?? date('Y-m-d', strtotime('+100 years')), // Standardmäßig weit in der Zukunft
         'farbe' => $atts['farbe'] ?? '',
-        'sfarbe' => $atts['sfarbe'] ?? ''
+        'sfarbe' => $atts['sfarbe'] ?? '#000000' // Standardmäßig schwarz
     ];
     
-    if (empty($atts['ende']) || empty($atts['farbe']) || empty($atts['sfarbe'])) {
-        error_log("Timed Infoboxes: Erforderliche Parameter fehlen (ende, farbe oder sfarbe)");
+    if (empty($atts['farbe'])) {
+        error_log("Timed Infoboxes: Erforderlicher Parameter 'farbe' fehlt");
         return null;
     }
     
